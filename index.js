@@ -1,6 +1,18 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 app.use(express.json());
+
+//creating token to log post request data
+morgan.token("post-data", (req, res) => {
+  return req.method === "POST" ? JSON.stringify(req.body) : null;
+});
+// tiny config + custom post-data token
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :post-data"
+  )
+);
 let persons = [
   {
     id: "1",
