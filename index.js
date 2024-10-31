@@ -2,6 +2,8 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
+require("dotenv").config();
+const Contact = require("./models/contact");
 
 app.use(express.json());
 app.use(cors());
@@ -16,51 +18,33 @@ app.use(
     ":method :url :status :res[content-length] - :response-time ms :post-data"
   )
 );
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Contact.find({}).then((contacts) => {
+    response.json(contacts);
+  });
 });
 app.get("/api/persons/:id", (request, response) => {
-  const id = String(request.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  Contact.findById(request.params.id).then((contact) => {
+    response.json(contact);
+  });
 });
+
 app.get("/info", (request, response) => {
   const date = new Date();
   response.send(
-    `<p>Phonebook has info for ${persons.length} people</p> <p>${date}</p>`
+    `<p>Phonebook has info for ${Contact.length} people</p> <p>${date}</p>` // this way of length doesn't work need to check on internet
   );
 });
-const generateid = () => {
-  return Math.round(Math.random() * 10000);
-};
-const nameExists = (name) => {
-  return persons.some((person) => person.name === name);
+
+const nameExists = (searchname) => {
+  Contact.findOne({ name: searchname }).then((person) => {
+    console.log(person.name);
+    console.log("search name:", searchname);
+    const boolValue = person.name === searchname;
+    console.log("bool:", boolValue);
+    return boolValue;
+  });
 };
 app.post("/api/persons", (request, response) => {
   const body = request.body;
@@ -74,20 +58,23 @@ app.post("/api/persons", (request, response) => {
       .status(400)
       .json({ error: "this name already exists, name must be unique" });
   }
-  const person = {
-    id: String(generateid()),
+  const person = new Contact({
     name: body.name,
     number: body.number,
-  };
-  persons = persons.concat(person);
-  response.json(persons);
+  });
+
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
+
 app.delete("/api/persons/:id", (request, response) => {
   const id = String(request.params.id);
   persons = persons.filter((person) => person.id !== id);
   response.status(204).end();
 });
-const PORT = process.env.PORT || 3001;
+
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`listening in port ${PORT}`);
 });
