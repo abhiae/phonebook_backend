@@ -1,2 +1,7 @@
 /node_modules
 /requests
+/dist
+/.github/workflows/fly-deploy.yml
+/.dockerignore
+/Dockerfile
+/fly.toml

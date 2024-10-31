@@ -1,8 +1,11 @@
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
-app.use(express.json());
+const cors = require("cors");
 
+app.use(express.json());
+app.use(cors());
+app.use(express.static("dist"));
 //creating token to log post request data
 morgan.token("post-data", (req, res) => {
   return req.method === "POST" ? JSON.stringify(req.body) : null;
@@ -35,7 +38,6 @@ let persons = [
     number: "39-23-6423122",
   },
 ];
-
 app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
@@ -85,7 +87,7 @@ app.delete("/api/persons/:id", (request, response) => {
   persons = persons.filter((person) => person.id !== id);
   response.status(204).end();
 });
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`listening in port ${PORT}`);
 });
