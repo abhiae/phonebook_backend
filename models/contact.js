@@ -14,8 +14,18 @@ mongoose
 
 // creating schema
 const contactSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: { type: String, minLength: 3, required: true },
+  number: {
+    type: String,
+    minLength: 8,
+    validate: {
+      validator: function (v) {
+        const regex = /^\d{2,3}-\d+$/;
+        return regex.test(v);
+      },
+    },
+    required: true,
+  },
 });
 contactSchema.set("toJSON", {
   transform: (document, returnedObject) => {
