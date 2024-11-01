@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
+const mongoose = require('mongoose');
+require('dotenv').config();
 // code to take password from command argument
 // Connect to MongoDB
 const url = process.env.MONGODB_URI;
 
-mongoose.set("strictQuery", false);
+mongoose.set('strictQuery', false);
 
 mongoose.connect(url);
 
@@ -13,7 +13,7 @@ const contactSchema = new mongoose.Schema({
   name: String,
   number: String,
 });
-const Contact = mongoose.model("Contact", contactSchema);
+const Contact = mongoose.model('Contact', contactSchema);
 
 // // Display All saved Contacts if just 3args are passed
 // if (process.argv.length === 3) {
@@ -71,7 +71,7 @@ const Contact = mongoose.model("Contact", contactSchema);
 //     mongoose.connection.close();
 //   });
 
-Contact.find({ name: "Test" }).then((contact) => {
+Contact.find({ name: 'Test' }).then((contact) => {
   console.log(contact);
   mongoose.connection.close();
 });

@@ -1,15 +1,15 @@
-const mongoose = require("mongoose");
-mongoose.set("strictQuery", false);
+const mongoose = require('mongoose');
+mongoose.set('strictQuery', false);
 
 const url = process.env.MONGODB_URI;
 
 mongoose
   .connect(url)
-  .then((result) => {
-    console.log("connected to the database");
+  .then(() => {
+    console.log('connected to the database');
   })
   .catch((error) => {
-    console.error("error connecting to the database", error.message);
+    console.error('error connecting to the database', error.message);
   });
 
 // creating schema
@@ -27,11 +27,11 @@ const contactSchema = new mongoose.Schema({
     required: true,
   },
 });
-contactSchema.set("toJSON", {
+contactSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
   },
 });
-module.exports = mongoose.model("Contact", contactSchema);
+module.exports = mongoose.model('Contact', contactSchema);

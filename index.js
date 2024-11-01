@@ -1,32 +1,32 @@
-const express = require("express");
-const morgan = require("morgan");
+const express = require('express');
+const morgan = require('morgan');
 const app = express();
-const cors = require("cors");
-require("dotenv").config();
-const Contact = require("./models/contact");
+const cors = require('cors');
+require('dotenv').config();
+const Contact = require('./models/contact');
 
-app.use(express.static("dist"));
+app.use(express.static('dist'));
 app.use(express.json());
 app.use(cors());
 
 //creating token to log post request data
-morgan.token("post-data", (req, res) => {
-  return req.method === "POST" ? JSON.stringify(req.body) : null;
+morgan.token('post-data', (req) => {
+  return req.method === 'POST' ? JSON.stringify(req.body) : null;
 });
 // tiny config + custom post-data token
 app.use(
   morgan(
-    ":method :url :status :res[content-length] - :response-time ms :post-data"
+    ':method :url :status :res[content-length] - :response-time ms :post-data'
   )
 );
 
-app.get("/api/persons", (request, response) => {
+app.get('/api/persons', (request, response) => {
   Contact.find({}).then((contacts) => {
     response.json(contacts);
   });
 });
 
-app.get("/api/persons/:id", (request, response, next) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Contact.findById(request.params.id)
     .then((contact) => {
       if (contact) {
@@ -38,7 +38,7 @@ app.get("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
-app.get("/info", (request, response) => {
+app.get('/info', (request, response, next) => {
   Contact.countDocuments({})
     .then((count) => {
       const date = new Date();
@@ -50,7 +50,7 @@ app.get("/info", (request, response) => {
 });
 
 // adding contact to the db
-app.post("/api/persons", (request, response, next) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body;
 
   const person = new Contact({
@@ -67,7 +67,7 @@ app.post("/api/persons", (request, response, next) => {
 });
 
 // adding support for put when the new number added for same name
-app.put("/api/persons/:id", (request, response, next) => {
+app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body;
   const person = {
     name: body.name,
@@ -77,19 +77,19 @@ app.put("/api/persons/:id", (request, response, next) => {
   Contact.findByIdAndUpdate(request.params.id, person, {
     new: true,
     runValidators: true,
-    context: "query",
+    context: 'query',
   })
     .then((updatedPerson) => {
-      console.log("person in put:", person);
-      console.log("updatedPerson:", updatedPerson);
+      console.log('person in put:', person);
+      console.log('updatedPerson:', updatedPerson);
       response.json(updatedPerson);
     })
     .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (request, response, next) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Contact.findByIdAndDelete(request.params.id)
-    .then((result) => {
+    .then(() => {
       response.status(204).end();
     })
     .catch((error) => next(error));
@@ -97,9 +97,9 @@ app.delete("/api/persons/:id", (request, response, next) => {
 
 const errorHandler = (error, request, response, next) => {
   console.log(error.message);
-  if (error.name === "CastError") {
-    return response.status(400).send({ error: "malformatted id" });
-  } else if (error.name === "ValidationError") {
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
   }
   next(error);
